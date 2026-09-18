@@ -2,6 +2,7 @@
 @using EventEaseApp.Models
 @using EventEaseApp.Services
 @inject EventService EventService
+@inject UserSessionService Session
 @inject NavigationManager Navigation
 
 <PageTitle>Register</PageTitle>
@@ -16,12 +17,20 @@ else if (submitted)
 {
     <h1>Registration Confirmed</h1>
     <p>Thank you, <strong>@registration.Name</strong>! You are registered for <strong>@selectedEvent.Name</strong>.</p>
-    <a class="btn btn-primary" href="events">Back to Events</a>
+    <div class="mt-3">
+        <a class="btn btn-primary" href="attendance">View My Attendance</a>
+        <a class="btn btn-outline-secondary" href="events">Back to Events</a>
+    </div>
 }
 else
 {
     <h1>Register for @selectedEvent.Name</h1>
     <p><strong>@selectedEvent.Date.ToString("dddd, MMMM d, yyyy")</strong> &mdash; @selectedEvent.Location</p>
+
+    @if (alreadyRegistered)
+    {
+        <div class="alert alert-info">You are already registered for this event.</div>
+    }
 
     <EditForm Model="registration" OnValidSubmit="HandleSubmit">
         <DataAnnotationsValidator />
@@ -30,11 +39,19 @@ else
         <div class="mb-3">
             <label class="form-label" for="name">Full Name</label>
             <InputText id="name" class="form-control" @bind-Value="registration.Name" />
+            <ValidationMessage For="() => registration.Name" />
         </div>
 
         <div class="mb-3">
             <label class="form-label" for="email">Email</label>
             <InputText id="email" class="form-control" @bind-Value="registration.Email" />
+            <ValidationMessage For="() => registration.Email" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="phone">Phone Number <span class="text-muted">(optional)</span></label>
+            <InputText id="phone" class="form-control" @bind-Value="registration.PhoneNumber" />
+            <ValidationMessage For="() => registration.PhoneNumber" />
         </div>
 
         <button type="submit" class="btn btn-success">Submit Registration</button>
@@ -48,25 +65,30 @@ else
 
     private Models.Event? selectedEvent;
     private bool submitted;
+    private bool alreadyRegistered;
     private readonly RegistrationModel registration = new();
 
     protected override void OnParametersSet()
     {
         selectedEvent = EventService.GetEventById(Id);
+        alreadyRegistered = selectedEvent is not null && Session.IsRegisteredFor(selectedEvent.Id);
+
+        if (Session.IsSignedIn)
+        {
+            registration.Name = Session.CurrentSession.Name;
+            registration.Email = Session.CurrentSession.Email;
+        }
     }
 
     private void HandleSubmit()
     {
+        if (selectedEvent is null)
+        {
+            return;
+        }
+
+        Session.SignIn(registration.Name, registration.Email);
+        Session.RegisterForEvent(selectedEvent);
         submitted = true;
-    }
-
-    private class RegistrationModel
-    {
-        [System.ComponentModel.DataAnnotations.Required]
-        public string Name { get; set; } = string.Empty;
-
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.EmailAddress]
-        public string Email { get; set; } = string.Empty;
     }
 }

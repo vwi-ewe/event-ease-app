@@ -1,0 +1,7 @@
+.attendance-title {
+    background: linear-gradient(90deg, #9b59b6, #2ecc71, #f1c40f, #e91e8c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}

@@ -1,0 +1,99 @@
+@page "/attendance"
+@using EventEaseApp.Services
+@inject UserSessionService Session
+@implements IDisposable
+
+<PageTitle>My Attendance</PageTitle>
+
+<h1 class="attendance-title">My Attendance</h1>
+
+@if (!Session.IsSignedIn)
+{
+    <div class="alert alert-warning">
+        You haven't registered for any events yet.
+        <a href="events">Browse events</a> to get started.
+    </div>
+}
+else
+{
+    <p class="mb-3">
+        Signed in as <strong>@Session.CurrentSession.Name</strong>
+        (@Session.CurrentSession.Email)
+        <button class="btn btn-sm btn-outline-secondary ms-2" @onclick="SignOut">Sign out</button>
+    </p>
+
+    <div class="row mb-4">
+        <div class="col">
+            <span class="badge bg-primary">Registered: @Session.Registrations.Count</span>
+            <span class="badge bg-success ms-1">Checked in: @checkedInCount</span>
+        </div>
+    </div>
+
+    @if (Session.Registrations.Count == 0)
+    {
+        <p>You have no active registrations.</p>
+    }
+    else
+    {
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attendee in Session.Registrations)
+                {
+                    <tr @key="attendee.EventId">
+                        <td>@attendee.EventName</td>
+                        <td>@attendee.EventDate.ToString("MMM d, yyyy")</td>
+                        <td>@attendee.Location</td>
+                        <td>
+                            @if (attendee.HasCheckedIn)
+                            {
+                                <span class="badge bg-success">Checked in</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Not checked in</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm @(attendee.HasCheckedIn ? "btn-outline-secondary" : "btn-success")"
+                                    @onclick="() => Session.ToggleCheckIn(attendee.EventId)">
+                                @(attendee.HasCheckedIn ? "Undo check-in" : "Check in")
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger ms-1"
+                                    @onclick="() => Session.CancelRegistration(attendee.EventId)">
+                                Cancel
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private int checkedInCount => Session.Registrations.Count(a => a.HasCheckedIn);
+
+    protected override void OnInitialized()
+    {
+        Session.OnChange += StateHasChanged;
+    }
+
+    private void SignOut()
+    {
+        Session.SignOut();
+    }
+
+    public void Dispose()
+    {
+        Session.OnChange -= StateHasChanged;
+    }
+}
