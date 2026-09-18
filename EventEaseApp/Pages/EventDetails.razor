@@ -1,0 +1,46 @@
+@page "/events/{Id:int}"
+@using EventEaseApp.Models
+@using EventEaseApp.Services
+@inject EventService EventService
+@inject NavigationManager Navigation
+
+<PageTitle>Event Details</PageTitle>
+
+@if (selectedEvent is null)
+{
+    <h1>Event Not Found</h1>
+    <p>Sorry, we couldn't find the event you were looking for.</p>
+    <a class="btn btn-primary" href="events">Back to Events</a>
+}
+else
+{
+    <h1>@selectedEvent.Name</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="card-text">
+                <strong>Date:</strong> @selectedEvent.Date.ToString("dddd, MMMM d, yyyy")
+            </p>
+            <p class="card-text">
+                <strong>Location:</strong> @selectedEvent.Location
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a class="btn btn-success" href="@($"register/{selectedEvent.Id}")">Register for this Event</a>
+        <a class="btn btn-outline-secondary" href="events">Back to Events</a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Models.Event? selectedEvent;
+
+    protected override void OnParametersSet()
+    {
+        selectedEvent = EventService.GetEventById(Id);
+    }
+}

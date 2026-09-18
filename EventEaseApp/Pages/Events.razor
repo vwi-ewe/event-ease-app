@@ -1,0 +1,40 @@
+@page "/events"
+@using EventEaseApp.Components
+@using EventEaseApp.Models
+@using EventEaseApp.Services
+@inject EventService EventService
+
+<PageTitle>Events</PageTitle>
+
+<h1>Upcoming Events</h1>
+
+<p>Browse our upcoming corporate and social events.</p>
+
+@if (events is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (events.Count == 0)
+{
+    <p>No events are currently scheduled.</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var ev in events)
+        {
+            <div class="col-md-6 col-lg-4">
+                <EventCard Event="ev" />
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private IReadOnlyList<Models.Event>? events;
+
+    protected override void OnInitialized()
+    {
+        events = EventService.GetEvents();
+    }
+}

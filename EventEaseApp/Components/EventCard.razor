@@ -1,0 +1,23 @@
+@using EventEaseApp.Models
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">@Event.Name</h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+            <span class="bi bi-calendar-event" aria-hidden="true"></span>
+            @Event.Date.ToString("dddd, MMMM d, yyyy")
+        </h6>
+        <p class="card-text">
+            <span class="bi bi-geo-alt" aria-hidden="true"></span>
+            @Event.Location
+        </p>
+        <a class="btn btn-primary btn-sm" href="@($"events/{Event.Id}")">View Details</a>
+        <a class="btn btn-outline-secondary btn-sm" href="@($"register/{Event.Id}")">Register</a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public Event Event { get; set; } = default!;
+}

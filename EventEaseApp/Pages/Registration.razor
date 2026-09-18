@@ -1,0 +1,72 @@
+@page "/register/{Id:int}"
+@using EventEaseApp.Models
+@using EventEaseApp.Services
+@inject EventService EventService
+@inject NavigationManager Navigation
+
+<PageTitle>Register</PageTitle>
+
+@if (selectedEvent is null)
+{
+    <h1>Event Not Found</h1>
+    <p>Sorry, we couldn't find the event you were trying to register for.</p>
+    <a class="btn btn-primary" href="events">Back to Events</a>
+}
+else if (submitted)
+{
+    <h1>Registration Confirmed</h1>
+    <p>Thank you, <strong>@registration.Name</strong>! You are registered for <strong>@selectedEvent.Name</strong>.</p>
+    <a class="btn btn-primary" href="events">Back to Events</a>
+}
+else
+{
+    <h1>Register for @selectedEvent.Name</h1>
+    <p><strong>@selectedEvent.Date.ToString("dddd, MMMM d, yyyy")</strong> &mdash; @selectedEvent.Location</p>
+
+    <EditForm Model="registration" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label" for="name">Full Name</label>
+            <InputText id="name" class="form-control" @bind-Value="registration.Name" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <InputText id="email" class="form-control" @bind-Value="registration.Email" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Submit Registration</button>
+        <a class="btn btn-outline-secondary" href="@($"events/{selectedEvent.Id}")">Cancel</a>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Models.Event? selectedEvent;
+    private bool submitted;
+    private readonly RegistrationModel registration = new();
+
+    protected override void OnParametersSet()
+    {
+        selectedEvent = EventService.GetEventById(Id);
+    }
+
+    private void HandleSubmit()
+    {
+        submitted = true;
+    }
+
+    private class RegistrationModel
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        public string Name { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.EmailAddress]
+        public string Email { get; set; } = string.Empty;
+    }
+}
