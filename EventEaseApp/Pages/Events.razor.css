@@ -1,0 +1,22 @@
+.event-list {
+    height: 70vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.event-list-item {
+    min-height: 180px;
+}
+
+.events-title {
+    background: linear-gradient(90deg, #e91e8c, #9b59b6, #2ecc71, #f1c40f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+.events-subtitle {
+    color: #9b59b6;
+    font-weight: 500;
+}

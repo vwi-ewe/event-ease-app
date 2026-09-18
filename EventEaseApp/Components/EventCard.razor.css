@@ -1,0 +1,35 @@
+.event-card {
+    border: none;
+    border-radius: 14px;
+    border-left: 8px solid #ccc;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.event-card .card-title {
+    font-weight: 600;
+}
+
+.accent-pink {
+    border-left-color: #e91e8c;
+    background-color: #fff0f7;
+}
+
+.accent-green {
+    border-left-color: #2ecc71;
+    background-color: #f0fbf4;
+}
+
+.accent-purple {
+    border-left-color: #9b59b6;
+    background-color: #f7f0fb;
+}
+
+.accent-yellow {
+    border-left-color: #f1c40f;
+    background-color: #fffbe6;
+}

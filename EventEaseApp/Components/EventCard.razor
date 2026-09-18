@@ -1,23 +1,39 @@
 @using EventEaseApp.Models
 
-<div class="card mb-3 shadow-sm">
-    <div class="card-body">
-        <h5 class="card-title">@Event.Name</h5>
-        <h6 class="card-subtitle mb-2 text-muted">
-            <span class="bi bi-calendar-event" aria-hidden="true"></span>
-            @Event.Date.ToString("dddd, MMMM d, yyyy")
-        </h6>
-        <p class="card-text">
-            <span class="bi bi-geo-alt" aria-hidden="true"></span>
-            @Event.Location
-        </p>
-        <a class="btn btn-primary btn-sm" href="@($"events/{Event.Id}")">View Details</a>
-        <a class="btn btn-outline-secondary btn-sm" href="@($"register/{Event.Id}")">Register</a>
+@if (Event is null || !Event.IsValid())
+{
+    <div class="card mb-3 border-warning">
+        <div class="card-body">
+            <h5 class="card-title text-warning">Invalid event</h5>
+            <p class="card-text text-muted">This event cannot be displayed because its data is missing or invalid.</p>
+        </div>
     </div>
-</div>
+}
+else
+{
+    <div class="card event-card mb-3 shadow-sm @ColorClass">
+        <div class="card-body">
+            <h5 class="card-title">@Event.Name</h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+                <span class="bi bi-calendar-event" aria-hidden="true"></span>
+                @Event.Date.ToString("dddd, MMMM d, yyyy")
+            </h6>
+            <p class="card-text">
+                <span class="bi bi-geo-alt" aria-hidden="true"></span>
+                @Event.Location
+            </p>
+            <a class="btn btn-primary btn-sm" href="@($"events/{Event.Id}")">View Details</a>
+            <a class="btn btn-outline-secondary btn-sm" href="@($"register/{Event.Id}")">Register</a>
+        </div>
+    </div>
+}
 
 @code {
     [Parameter]
     [EditorRequired]
-    public Event Event { get; set; } = default!;
+    public Event? Event { get; set; }
+
+    private static readonly string[] Colors = { "accent-pink", "accent-green", "accent-purple", "accent-yellow" };
+
+    private string ColorClass => Event is null ? string.Empty : Colors[Event.Id % Colors.Length];
 }
